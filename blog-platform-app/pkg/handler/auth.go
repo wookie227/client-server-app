@@ -37,12 +37,36 @@ func (h *Handler) signIn(c *gin.Context) {
 		newErrorResponse(c, http.StatusBadRequest, err.Error())
 		return
 	}
+
 	token, err := h.services.Authorization.GenerateToken(input.Email, input.Password)
 	if err != nil {
 		newErrorResponse(c, http.StatusInternalServerError, err.Error())
 		return
 	}
+
+	c.SetCookie(
+		"authToken", // Название cookie
+		token,       // Значение токена
+		3600,        // Время жизни в секундах (3600 секунд = 1 час)
+		"/",         // Путь cookie ("/" означает, что он будет доступен на всем сайте)
+		"",          // Домен (пусто - используется текущий домен)
+		false,       // Secure: если true, cookie будет передаваться только по HTTPS
+		true,        // HttpOnly: если true, запрещает доступ к cookie через JavaScript
+	)
+
 	c.JSON(http.StatusOK, map[string]interface{}{
 		"token": token,
 	})
+}
+
+func (h *Handler) logout(c *gin.Context) {
+	http.SetCookie(c.Writer, &http.Cookie{
+		Name:     "authToken",
+		Value:    "",
+		Path:     "/",
+		HttpOnly: true,
+		MaxAge:   -1,
+	})
+
+	c.JSON(http.StatusOK, gin.H{"message": "Logged out"})
 }

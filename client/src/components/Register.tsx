@@ -1,10 +1,7 @@
 import React, { useState, ChangeEvent, FormEvent } from 'react';
+import { useNavigate } from 'react-router-dom';
 import styles from './Register.module.css';
-import {TextField, Button} from '@mui/material'
-
-interface RegisterProps {
-  onSwitchToLogin: () => void;
-}
+import { TextField, Button } from '@mui/material';
 
 interface RegisterFormData {
   email: string;
@@ -15,7 +12,7 @@ interface RegisterFormData {
   password: string;
 }
 
-const Register: React.FC<RegisterProps> = ({ onSwitchToLogin }) => {
+const Register: React.FC = () => {
   const [formData, setFormData] = useState<RegisterFormData>({
     email: '',
     phone: '',
@@ -24,6 +21,10 @@ const Register: React.FC<RegisterProps> = ({ onSwitchToLogin }) => {
     patronymic: '',
     password: ''
   });
+
+  const navigate = useNavigate(); // используем навигацию
+
+  const isFormValid = Object.values(formData).every(value => value.trim() !== '');
 
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -44,7 +45,7 @@ const Register: React.FC<RegisterProps> = ({ onSwitchToLogin }) => {
         },
         body: JSON.stringify(formData),
       });
-      console.log(response.body)
+      console.log(response.body);
 
       if (!response.ok) {
         throw new Error('Network response was not ok');
@@ -55,7 +56,6 @@ const Register: React.FC<RegisterProps> = ({ onSwitchToLogin }) => {
       // Дополнительная логика при успешной регистрации
     } catch (error) {
       console.error('Error:', error);
-      // Логика обработки ошибок
     }
   };
 
@@ -63,17 +63,60 @@ const Register: React.FC<RegisterProps> = ({ onSwitchToLogin }) => {
     <div className={styles.registerContainer}>
       <h2 className={styles.registerTitle}>Register</h2>
       <form className={styles.form} onSubmit={handleSubmit}>
-        <TextField label={'Email'} id="inputEmailSignUp" margin="normal" onSubmit={handleChange}/>
-        <TextField label={'Phone'} id="inputPhoneSignUp" margin="normal" onSubmit={handleChange}/>
-        <TextField label={'Surname'} id="inputSurnameSignUp" margin="normal" onSubmit={handleChange}/>
-        <TextField label={'Name'} id="inputNameSignUp" margin="normal" onSubmit={handleChange}/>
-        <TextField label={'Patronymic'} id="inputPatronymicSignUp" margin="normal" onSubmit={handleChange}/>
-        <TextField label={'Password'} id="inputPasswordSignUp" margin="normal" onSubmit={handleChange}/>
-        <Button type="submit" variant='contained'>
+        <TextField
+          label="Email"
+          id="inputEmailSignUp"
+          margin="normal"
+          name="email"
+          value={formData.email}
+          onChange={handleChange}
+        />
+        <TextField
+          label="Phone"
+          id="inputPhoneSignUp"
+          margin="normal"
+          name="phone"
+          value={formData.phone}
+          onChange={handleChange}
+        />
+        <TextField
+          label="Surname"
+          id="inputSurnameSignUp"
+          margin="normal"
+          name="surname"
+          value={formData.surname}
+          onChange={handleChange}
+        />
+        <TextField
+          label="Name"
+          id="inputNameSignUp"
+          margin="normal"
+          name="name"
+          value={formData.name}
+          onChange={handleChange}
+        />
+        <TextField
+          label="Patronymic"
+          id="inputPatronymicSignUp"
+          margin="normal"
+          name="patronymic"
+          value={formData.patronymic}
+          onChange={handleChange}
+        />
+        <TextField
+          label="Password"
+          id="inputPasswordSignUp"
+          margin="normal"
+          name="password"
+          type="password"
+          value={formData.password}
+          onChange={handleChange}
+        />
+        <Button type="submit" variant="contained" disabled={!isFormValid}>
           Register
         </Button>
       </form>
-      <p className={styles.switchText} onClick={onSwitchToLogin}>
+      <p className={styles.switchText} onClick={() => navigate('/login')}>
         Already have an account? Login
       </p>
     </div>

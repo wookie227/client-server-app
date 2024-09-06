@@ -1,0 +1,27 @@
+/* Header.module.css */
+.header {
+    width: 100%;      /* Убедитесь, что хедер занимает всю ширину */
+    background-color: #ffffff; /* Пример фона */
+    padding: 10px 20px;
+    position: fixed;  /* Закрепляем хедер в верхней части экрана */
+    top: 0;           /* Позиционируем его у верхней границы */
+    left: 0;
+    z-index: 1000;    /* Чтобы он всегда был поверх остальных элементов */
+  }
+  
+  nav ul {
+    display: flex;
+    justify-content: flex-start; /* Выравниваем элементы навигации влево */
+    list-style-type: none;       /* Убираем маркеры списка */
+    padding: 0;
+  }
+  
+  nav li {
+    margin-right: 20px;  /* Расстояние между ссылками */
+  }
+  
+  nav li a {
+    text-decoration: none; /* Убираем подчеркивание у ссылок */
+    color: #333;           /* Цвет текста ссылок */
+  }
+  

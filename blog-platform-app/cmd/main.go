@@ -41,7 +41,7 @@ func main() {
 	handlers := handler.NewHandler(services)
 
 	corsHandler := cors.New(cors.Options{
-		AllowedOrigins:   []string{"*"}, // Разрешить все домены, но лучше указать конкретные домены
+		AllowedOrigins:   []string{"http://localhost:5173"}, // Разрешить все домены, но лучше указать конкретные домены
 		AllowedMethods:   []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
 		AllowedHeaders:   []string{"Content-Type", "Authorization"},
 		AllowCredentials: true,

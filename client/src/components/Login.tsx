@@ -1,10 +1,10 @@
 import React, { useState, ChangeEvent, FormEvent } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { TextField, Button } from '@mui/material';
 import styles from './Login.module.css';
-import {TextField, Button} from '@mui/material'
-import './a.css'
 
 interface LoginProps {
-  onSwitchToRegister: () => void;
+  onLoginSuccess: () => void;
 }
 
 interface LoginFormData {
@@ -12,11 +12,13 @@ interface LoginFormData {
   password: string;
 }
 
-const Login: React.FC<LoginProps> = ({ onSwitchToRegister }) => {
+const Login: React.FC<LoginProps> = ({ onLoginSuccess }) => {
   const [formData, setFormData] = useState<LoginFormData>({
     email: '',
     password: ''
   });
+
+  const navigate = useNavigate(); // используем навигацию
 
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -35,8 +37,8 @@ const Login: React.FC<LoginProps> = ({ onSwitchToRegister }) => {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify(formData),
+        credentials: 'include'
       });
-      console.log(response.body)
 
       if (!response.ok) {
         throw new Error('Network response was not ok');
@@ -44,10 +46,10 @@ const Login: React.FC<LoginProps> = ({ onSwitchToRegister }) => {
 
       const result = await response.json();
       console.log('Success:', result);
-      // Дополнительная логика при успешной регистрации
+
+      onLoginSuccess(); // Вызываем функцию после успешной авторизации
     } catch (error) {
       console.error('Error:', error);
-      // Логика обработки ошибок
     }
   };
 
@@ -55,13 +57,30 @@ const Login: React.FC<LoginProps> = ({ onSwitchToRegister }) => {
     <div className={styles.loginContainer}>
       <h2 className={styles.loginTitle}>Login</h2>
       <form className={styles.form} onSubmit={handleSubmit}>
-      <TextField variant="standard" label={'Email'} id="inputEmailSignIn" margin="normal" onSubmit={handleChange}/>
-      <TextField variant="standard" label={'Password'} id="inputPasswordSignIn" margin="normal" onSubmit={handleChange} />
-        <Button variant='contained' type="submit" className='marginAll'>
+        <TextField
+          variant="standard"
+          label="Email"
+          id="inputEmailSignIn"
+          margin="normal"
+          name="email"
+          value={formData.email}
+          onChange={handleChange}
+        />
+        <TextField
+          variant="standard"
+          label="Password"
+          id="inputPasswordSignIn"
+          margin="normal"
+          name="password"
+          type="password"
+          value={formData.password}
+          onChange={handleChange}
+        />
+        <Button variant="contained" type="submit" className="marginAll">
           Login
         </Button>
       </form>
-      <p className={styles.switchText} onClick={onSwitchToRegister}>
+      <p className={styles.switchText} onClick={() => navigate('/register')}>
         Don't have an account? Register
       </p>
     </div>
