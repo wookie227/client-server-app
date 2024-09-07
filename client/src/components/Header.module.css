@@ -1,27 +1,50 @@
-/* Header.module.css */
 .header {
-    width: 100%;      /* Убедитесь, что хедер занимает всю ширину */
-    background-color: #ffffff; /* Пример фона */
-    padding: 10px 20px;
-    position: fixed;  /* Закрепляем хедер в верхней части экрана */
-    top: 0;           /* Позиционируем его у верхней границы */
-    left: 0;
-    z-index: 1000;    /* Чтобы он всегда был поверх остальных элементов */
-  }
-  
-  nav ul {
-    display: flex;
-    justify-content: flex-start; /* Выравниваем элементы навигации влево */
-    list-style-type: none;       /* Убираем маркеры списка */
-    padding: 0;
-  }
-  
-  nav li {
-    margin-right: 20px;  /* Расстояние между ссылками */
-  }
-  
-  nav li a {
-    text-decoration: none; /* Убираем подчеркивание у ссылок */
-    color: #333;           /* Цвет текста ссылок */
-  }
-  
+  width: 100%; /* Хедер занимает всю ширину */
+  background-color: #ffffff; /* Пример фона */
+  padding: 10px 20px;
+  position: fixed; /* Закрепляем хедер в верхней части экрана */
+  top: 0; /* Позиционируем у верхней границы */
+  left: 0;
+  z-index: 1000; /* Поверх остальных элементов */
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Легкая тень для хедера */
+  display: flex; /* Flexbox для распределения контента */
+  justify-content: space-between; /* Пространство между ссылками и кнопкой */
+  align-items: center; /* Вертикальное выравнивание */
+}
+
+nav {
+  display: flex; /* Flexbox для выравнивания ссылок */
+}
+
+nav ul {
+  display: flex; /* Ссылки идут в одну строку */
+  list-style-type: none; /* Убираем маркеры списка */
+  padding: 0;
+  margin: 0;
+}
+
+nav li {
+  margin-right: 20px; /* Расстояние между ссылками */
+}
+
+nav li a {
+  text-decoration: none; /* Убираем подчеркивание у ссылок */
+  color: #333; /* Цвет текста ссылок */
+  font-size: large;
+}
+
+.logoutButton {
+  background-color: #ff4b5c; /* Цвет кнопки Logout */
+  color: #fff;
+  border: none;
+  padding: 10px 20px;
+  cursor: pointer;
+  border-radius: 4px;
+  font-weight: bold;
+  transition: background-color 0.3s ease;
+  margin-right: 50px;
+}
+
+.logoutButton:hover {
+  background-color: #ff2a3b; /* Темнее при наведении */
+}

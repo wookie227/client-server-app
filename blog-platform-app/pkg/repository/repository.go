@@ -11,6 +11,10 @@ type Authorization interface {
 	GetUser(email, password string) (models.User, error)
 }
 
+type Users interface {
+	GetAll() ([]models.User, error)
+}
+
 type News interface {
 }
 
@@ -26,6 +30,7 @@ type Messages interface {
 type Repository struct {
 	Authorization
 	News
+	Users
 	Chats
 	ChatMembers
 	Messages
@@ -34,5 +39,6 @@ type Repository struct {
 func NewRepository(db *sqlx.DB) *Repository {
 	return &Repository{
 		Authorization: NewAuthPostgres(db),
+		Users:         NewUsersListPostgres(db),
 	}
 }

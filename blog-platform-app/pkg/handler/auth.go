@@ -51,7 +51,7 @@ func (h *Handler) signIn(c *gin.Context) {
 		"/",         // Путь cookie ("/" означает, что он будет доступен на всем сайте)
 		"",          // Домен (пусто - используется текущий домен)
 		false,       // Secure: если true, cookie будет передаваться только по HTTPS
-		true,        // HttpOnly: если true, запрещает доступ к cookie через JavaScript
+		false,       // HttpOnly: если true, запрещает доступ к cookie через JavaScript //TODO работа с httpOnlyCookie
 	)
 
 	c.JSON(http.StatusOK, map[string]interface{}{

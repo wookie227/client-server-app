@@ -1,7 +1,7 @@
 import React, { useState, ChangeEvent, FormEvent } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { TextField, Button, Snackbar, Alert } from '@mui/material';
 import styles from './Register.module.css';
-import { TextField, Button } from '@mui/material';
 
 interface RegisterFormData {
   email: string;
@@ -22,8 +22,10 @@ const Register: React.FC = () => {
     password: ''
   });
 
-  const navigate = useNavigate(); // используем навигацию
+  const [openSnackbar, setOpenSnackbar] = useState(false); // Состояние для отображения Snackbar
+  const navigate = useNavigate(); // Хук для навигации
 
+  // Проверка, заполнены ли все поля
   const isFormValid = Object.values(formData).every(value => value.trim() !== '');
 
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
@@ -45,7 +47,6 @@ const Register: React.FC = () => {
         },
         body: JSON.stringify(formData),
       });
-      console.log(response.body);
 
       if (!response.ok) {
         throw new Error('Network response was not ok');
@@ -53,10 +54,21 @@ const Register: React.FC = () => {
 
       const result = await response.json();
       console.log('Success:', result);
-      // Дополнительная логика при успешной регистрации
+
+      // Показать уведомление об успешной регистрации
+      setOpenSnackbar(true);
+
+      // Перенаправляем на страницу логина через 2 секунды
+      setTimeout(() => {
+        navigate('/login');
+      }, 2000); // Задержка в 2 секунды для показа Snackbar
     } catch (error) {
       console.error('Error:', error);
     }
+  };
+
+  const handleCloseSnackbar = () => {
+    setOpenSnackbar(false);
   };
 
   return (
@@ -116,9 +128,18 @@ const Register: React.FC = () => {
           Register
         </Button>
       </form>
-      <p className={styles.switchText} onClick={() => navigate('/login')}>
-        Already have an account? Login
-      </p>
+
+      {/* Snackbar с сообщением об успешной регистрации */}
+      <Snackbar
+        open={openSnackbar}
+        autoHideDuration={6000}
+        onClose={handleCloseSnackbar}
+        anchorOrigin={{ vertical: 'top', horizontal: 'center' }} // Позиционирование сверху по центру
+      >
+        <Alert onClose={handleCloseSnackbar} severity="success" sx={{ width: '100%' }}>
+          Registration successful! Redirecting to login...
+        </Alert>
+      </Snackbar>
     </div>
   );
 };

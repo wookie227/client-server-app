@@ -17,9 +17,12 @@ const Header: React.FC<HeaderProps> = ({ onLogout }) => {
           <li>
             <Link to="/chat">Chat</Link>
           </li>
+          <li>
+            <Link to={"/users"}>Users</Link>
+          </li>
         </ul>
       </nav>
-      <button className={styles.logoutButton} onClick={onLogout}>
+      <button className={styles.logoutButton} onClick={onLogout} >
         Logout
       </button>
     </header>

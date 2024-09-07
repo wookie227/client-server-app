@@ -6,6 +6,7 @@ import News from './components/News';
 import Chat from './components/Chat';
 import Header from './components/Header';
 import styles from './App.module.css';
+import Users from './components/Users';
 
 const App: React.FC = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(() => {
@@ -47,6 +48,7 @@ const App: React.FC = () => {
             <>
               <Route path="/news" element={<News />} />
               <Route path="/chat" element={<Chat />} />
+              <Route path='/users' element={<Users/>} />
               <Route path="*" element={<Navigate to="/news" />} />
             </>
           ) : (
