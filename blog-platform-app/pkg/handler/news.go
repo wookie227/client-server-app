@@ -14,7 +14,13 @@ func (h *Handler) createNew(c *gin.Context) {
 }
 
 func (h *Handler) getAllNews(c *gin.Context) {
+	news, err := h.services.News.GetAll()
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
 
+	c.JSON(http.StatusOK, news)
 }
 
 func (h *Handler) getNewById(c *gin.Context) {

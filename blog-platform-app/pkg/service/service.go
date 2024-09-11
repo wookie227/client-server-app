@@ -16,15 +16,19 @@ type Users interface {
 }
 
 type News interface {
+	GetAll() ([]models.NewsDTO, error)
 }
 
 type Chats interface {
+	GetAll() ([]models.Chat, error)
 }
 
 type ChatMembers interface {
+	GetAll() ([]models.ChatMember, error)
 }
 
 type Messages interface {
+	GetAll() ([]models.Message, error)
 }
 
 type Service struct {
@@ -40,5 +44,6 @@ func NewService(repos *repository.Repository) *Service {
 	return &Service{
 		Authorization: NewAuthService(repos.Authorization),
 		Users:         NewUsersListService(repos.Users),
+		News:          NewNewsListService(repos.News),
 	}
 }

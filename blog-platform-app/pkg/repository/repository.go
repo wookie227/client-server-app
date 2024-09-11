@@ -16,15 +16,19 @@ type Users interface {
 }
 
 type News interface {
+	GetAll() ([]models.NewsDTO, error)
 }
 
 type Chats interface {
+	GetAll() ([]models.Chat, error)
 }
 
 type ChatMembers interface {
+	GetAll() ([]models.ChatMember, error)
 }
 
 type Messages interface {
+	GetAll() ([]models.Message, error)
 }
 
 type Repository struct {
@@ -40,5 +44,6 @@ func NewRepository(db *sqlx.DB) *Repository {
 	return &Repository{
 		Authorization: NewAuthPostgres(db),
 		Users:         NewUsersListPostgres(db),
+		News:          NewNewsListPostgres(db),
 	}
 }
