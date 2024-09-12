@@ -16,3 +16,7 @@ func NewNewsListService(repo repository.News) *NewsListService {
 func (s *NewsListService) GetAll() ([]models.NewsDTO, error) {
 	return s.repo.GetAll()
 }
+
+func (s *NewsListService) Create(news models.News) (*models.News, error) {
+	return s.repo.Create(news)
+}

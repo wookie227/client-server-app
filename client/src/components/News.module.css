@@ -1,0 +1,111 @@
+/* Контейнер для новостей */
+/* Обязательно добавляем стили для контейнера, если они не заданы */
+.newsContainer {
+  position: relative;
+  width: 700px;
+  max-width: 700px; /* Максимальная ширина контейнера */
+  margin: 0 auto; /* Центрирование контейнера */
+  padding: 20px; /* Внутренние отступы */
+  overflow-x: hidden; /* Отключаем горизонтальный скролл */
+  overflow-y: auto;
+}
+
+/* Заголовок страницы */
+.title {
+  text-align: center;
+  color: #333;
+  font-size: 2rem;
+  margin-bottom: 20px;
+  word-wrap: break-word; /* Для длинных слов */
+}
+
+/* Кнопка "Добавить" в левом нижнем углу */
+.fab {
+  /* position: fixed; Фиксируем кнопку относительно окна */
+  bottom: 20px; /* Располагаем внизу */
+  right: 20px; /* Располагаем справа */
+  background-color: #007bff;
+  color: white;
+  z-index: 1000;
+  box-shadow: 0px 2px 10px rgba(0, 0, 0, 0.2);
+  transition: background-color 0.3s ease; /* Плавный переход при наведении */
+}
+
+.fab:hover {
+  background-color: #0056b3; /* Темнее при наведении */
+}
+
+/* Блок каждой новости */
+.newsItem {
+  background-color: #fff;
+  border: 1px solid #ddd;
+  padding: 15px;
+  margin-bottom: 20px;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  transition: box-shadow 0.3s ease;
+  max-width: 100%; /* Ограничиваем ширину блока новости */
+  overflow: hidden; /* Прячем элементы, которые могут выйти за границы */
+}
+
+/* Эффект при наведении на блок новости */
+.newsItem:hover {
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2); /* Увеличиваем тень при наведении */
+}
+
+/* Верхняя часть новости (имя пользователя и дата) */
+.newsHeader {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.9rem;
+  color: #555;
+  margin-bottom: 10px;
+  flex-wrap: wrap; /* Для адаптивного расположения */
+  overflow: hidden; /* Предотвращаем выход за границы экрана */
+}
+
+/* Имя пользователя */
+.userName {
+  font-weight: bold;
+  color: #007bff;
+  text-decoration: none;
+}
+
+.userName:hover {
+  text-decoration: underline;
+}
+
+/* Дата публикации */
+.date {
+  color: #777;
+  text-align: right;
+  font-size: 0.85rem;
+  white-space: nowrap; /* Предотвращаем перенос на новую строку */
+}
+
+/* Заголовок новости */
+.newsTitle {
+  font-size: 1.5rem;
+  margin-bottom: 10px;
+  color: #333;
+  word-wrap: break-word; /* Длинные слова будут переноситься */
+}
+
+/* Текст новости */
+.newsText {
+  font-size: 1.1rem;
+  line-height: 1.6;
+  color: #555;
+  margin-bottom: 10px;
+  word-wrap: break-word; /* Длинные слова в тексте будут переноситься */
+}
+
+/* Изображение новости */
+.newsImage {
+  width: 100%;
+  height: auto;
+  margin-top: 15px;
+  border-radius: 8px;
+  object-fit: cover;
+  max-width: 100%; /* Ограничиваем изображение по ширине */
+}

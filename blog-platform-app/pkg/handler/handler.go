@@ -35,7 +35,7 @@ func (h *Handler) InitRoutes() *gin.Engine {
 		{
 			news.POST("/", h.createNew)
 			news.GET("/", h.getAllNews)
-			news.GET("/:id", h.getNewById)
+			news.GET("/:id", h.getNewByTitle)
 			news.PUT("/:id", h.updateNew)
 			news.DELETE("/:id", h.deleteNew)
 		}
