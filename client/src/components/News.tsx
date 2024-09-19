@@ -1,15 +1,15 @@
 import React, { useEffect, useState } from 'react';
 import Cookies from 'js-cookie';
 import { Fab } from '@mui/material';
-import AddIcon from '@mui/icons-material/Add'; // Иконка плюсика
-import CreateNewsDialog from './CreateNewsDialog'; // Импортируем компонент формы создания новостей
+import AddIcon from '@mui/icons-material/Add';
+import CreateNewsDialog from './CreateNewsDialog';
 import styles from './News.module.css';
 
 const News: React.FC = () => {
   const [newsList, setNewsList] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
-  const [openCreateDialog, setOpenCreateDialog] = useState(false); // Состояние для управления диалогом
+  const [openCreateDialog, setOpenCreateDialog] = useState(false);
 
   useEffect(() => {
     const fetchNews = async () => {
@@ -65,7 +65,11 @@ const News: React.FC = () => {
               </p>
               <p>{news.text}</p>
               {news.image_url && (
-                <img src={news.image_url} alt={news.title} className={styles.newsImage} />
+                <img
+                  src={`http://localhost:8000${news.image_url}`}
+                  alt={news.title}
+                  className={styles.newsImage}
+                />
               )}
             </div>
           ))
@@ -74,20 +78,18 @@ const News: React.FC = () => {
         )}
       </div>
 
-      {/* Кнопка для открытия формы создания новости */}
       <Fab
         color="primary"
         className={styles.fab}
-        style={{position:'fixed'}} // Применяем стили для позиционирования
-        onClick={() => setOpenCreateDialog(true)} // Открываем диалог
+        style={{ position: 'fixed' }}
+        onClick={() => setOpenCreateDialog(true)}
       >
         <AddIcon />
       </Fab>
 
-      {/* Диалоговое окно для создания новости */}
       <CreateNewsDialog
         open={openCreateDialog}
-        onClose={() => setOpenCreateDialog(false)} // Закрываем диалог
+        onClose={() => setOpenCreateDialog(false)}
       />
     </>
   );

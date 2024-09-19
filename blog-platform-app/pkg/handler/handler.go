@@ -25,6 +25,8 @@ func (h *Handler) InitRoutes() *gin.Engine {
 	}
 
 	api := router.Group("/api", h.userIdentity) //
+	api.POST("/upload")
+	router.Static("/uploads", "./uploads")
 	{
 		users := api.Group("/users")
 		{

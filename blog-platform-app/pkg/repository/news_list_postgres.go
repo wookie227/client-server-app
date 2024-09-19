@@ -2,6 +2,7 @@ package repository
 
 import (
 	models "blog-platform-app/Models"
+	"fmt"
 
 	"github.com/jmoiron/sqlx"
 )
@@ -16,14 +17,15 @@ func NewNewsListPostgres(db *sqlx.DB) *NewsListPostgres {
 
 func (r *NewsListPostgres) Create(news models.News) (*models.News, error) {
 	query := `
-    INSERT INTO news (user_id, title, text, image_url, date)
-    VALUES ($1, $2, $3, $4, $5)
-    RETURNING id
-    `
+	INSERT INTO news (user_id, title, text, image_url, date)
+	VALUES ($1, $2, $3, $4, $5)
+	RETURNING id
+	`
 	var id uint
+	fmt.Println(news)
 	err := r.db.QueryRow(query, news.UserID, news.Title, news.Text, news.ImageURL, news.Date).Scan(&id)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("error inserting news into database: %v", err)
 	}
 
 	// Возвращаем созданную новость с заполненным ID
@@ -34,7 +36,6 @@ func (r *NewsListPostgres) Create(news models.News) (*models.News, error) {
 func (r *NewsListPostgres) GetAll() ([]models.NewsDTO, error) {
 	var news []models.NewsDTO
 
-	// SQL-запрос для получения новостей с именем пользователя
 	query := `
     SELECT n.id, u.name AS user_name, u.surname, n.title, n.text, n.image_url, n.date
     FROM news n

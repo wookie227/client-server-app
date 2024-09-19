@@ -7,10 +7,10 @@ import {
   DialogTitle,
   TextField,
   Grid,
-  IconButton,
   Typography,
 } from '@mui/material';
 import { PhotoCamera } from '@mui/icons-material';
+import Cookies from 'js-cookie';
 
 interface CreateNewsDialogProps {
   open: boolean;
@@ -20,30 +20,56 @@ interface CreateNewsDialogProps {
 const CreateNewsDialog: React.FC<CreateNewsDialogProps> = ({ open, onClose }) => {
   const [title, setTitle] = useState('');
   const [text, setText] = useState('');
-  const [imageURL, setImageURL] = useState<string | ArrayBuffer | null>(null);
+  const [image, setImage] = useState<File | null>(null);
+  const [error, setError] = useState<string | null>(null);
 
   // Обработка выбора файла
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setImageURL(reader.result);
-      };
-      reader.readAsDataURL(file);
+      setImage(file);
     }
   };
 
   // Обработка формы отправки
-  const handleSubmit = () => {
-    const newsData = {
-      title,
-      text,
-      imageURL,
-    };
+  const handleSubmit = async () => {
+    const formData = new FormData();
+    formData.append('title', title);
+    formData.append('text', text);
 
-    console.log('News data:', newsData); // Тут можно добавить отправку данных на сервер
-    onClose(); // Закрыть окно после отправки
+    if (image) {
+      formData.append('file', image);
+    }
+
+    const token = Cookies.get('authToken');
+    if (!token) {
+      setError('Authentication token is missing');
+      return;
+    }
+
+    try {
+      const response = await fetch('http://localhost:8000/api/news', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        },
+        body: formData,
+        credentials: 'include',
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to create news');
+      }
+
+      const result = await response.json();
+      console.log('News created:', result);
+
+      onClose();
+      window.location.reload();
+    } catch (error) {
+      setError('Error creating news');
+      console.error('Error:', error);
+    }
   };
 
   return (
@@ -84,19 +110,15 @@ const CreateNewsDialog: React.FC<CreateNewsDialogProps> = ({ open, onClose }) =>
               onChange={handleFileChange}
             />
             <label htmlFor="file-upload">
-              <Button
-                variant="outlined"
-                component="span"
-                startIcon={<PhotoCamera />}
-              >
+              <Button variant="outlined" component="span" startIcon={<PhotoCamera />}>
                 Upload Image
               </Button>
             </label>
-            {imageURL && (
+            {image && (
               <Grid container spacing={2} marginTop={2}>
                 <Grid item>
                   <img
-                    src={imageURL as string}
+                    src={URL.createObjectURL(image)}
                     alt="Preview"
                     style={{ maxWidth: '200px', maxHeight: '200px' }}
                   />
@@ -105,6 +127,8 @@ const CreateNewsDialog: React.FC<CreateNewsDialogProps> = ({ open, onClose }) =>
             )}
           </Grid>
         </Grid>
+
+        {error && <Typography color="error">{error}</Typography>}
       </DialogContent>
 
       <DialogActions>

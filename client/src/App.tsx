@@ -5,8 +5,8 @@ import Register from './components/Register';
 import News from './components/News';
 import Chat from './components/Chat';
 import Header from './components/Header';
-import styles from './App.module.css';
 import Users from './components/Users';
+import styles from './App.module.css';  // Подключаем стили
 
 const App: React.FC = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(() => {
@@ -43,22 +43,26 @@ const App: React.FC = () => {
     <div className={styles.App}>
       <Router>
         {isAuthenticated && <Header onLogout={handleLogout} />}
-        <Routes>
-          {isAuthenticated ? (
-            <>
-              <Route path="/news" element={<News />} />
-              <Route path="/chat" element={<Chat />} />
-              <Route path='/users' element={<Users/>} />
-              <Route path="*" element={<Navigate to="/news" />} />
-            </>
-          ) : (
-            <>
-              <Route path="/login" element={<Login onLoginSuccess={handleLoginSuccess} />} />
-              <Route path="/register" element={<Register />} />
-              <Route path="*" element={<Navigate to="/login" />} />
-            </>
-          )}
-        </Routes>
+        
+        {/* Контейнер для контента, который будет иметь отступ сверху */}
+        <div className={styles.contentContainer}>
+          <Routes>
+            {isAuthenticated ? (
+              <>
+                <Route path="/news" element={<News />} />
+                <Route path="/chat" element={<Chat />} />
+                <Route path='/users' element={<Users />} />
+                <Route path="*" element={<Navigate to="/news" />} />
+              </>
+            ) : (
+              <>
+                <Route path="/login" element={<Login onLoginSuccess={handleLoginSuccess} />} />
+                <Route path="/register" element={<Register />} />
+                <Route path="*" element={<Navigate to="/login" />} />
+              </>
+            )}
+          </Routes>
+        </div>
       </Router>
     </div>
   );
