@@ -25,6 +25,11 @@ func (h *Handler) signUp(c *gin.Context) {
 
 }
 
+type signInResponse struct {
+	Token  string `json:"token"`
+	UserID int    `json:"userId"`
+}
+
 type signInInput struct {
 	Email    string `json:"email" binding:"required"`
 	Password string `json:"password" binding:"required"`
@@ -38,7 +43,7 @@ func (h *Handler) signIn(c *gin.Context) {
 		return
 	}
 
-	token, err := h.services.Authorization.GenerateToken(input.Email, input.Password)
+	token, userId, err := h.services.Authorization.GenerateToken(input.Email, input.Password)
 	if err != nil {
 		newErrorResponse(c, http.StatusInternalServerError, err.Error())
 		return
@@ -54,8 +59,9 @@ func (h *Handler) signIn(c *gin.Context) {
 		false,       // HttpOnly: если true, запрещает доступ к cookie через JavaScript //TODO работа с httpOnlyCookie
 	)
 
-	c.JSON(http.StatusOK, map[string]interface{}{
-		"token": token,
+	c.JSON(http.StatusOK, signInResponse{
+		Token:  token,
+		UserID: userId,
 	})
 }
 

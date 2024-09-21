@@ -37,7 +37,7 @@ func (r *NewsListPostgres) GetAll() ([]models.NewsDTO, error) {
 	var news []models.NewsDTO
 
 	query := `
-    SELECT n.id, u.name AS user_name, u.surname, n.title, n.text, n.image_url, n.date
+    SELECT n.id, n.user_id, u.name AS user_name, u.surname, n.title, n.text, n.image_url, n.date
     FROM news n
     JOIN users u ON n.user_id = u.id
     `

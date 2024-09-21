@@ -1,6 +1,9 @@
+// src/components/Login.tsx
 import React, { useState, ChangeEvent, FormEvent } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { TextField, Button } from '@mui/material';
+import { useDispatch } from 'react-redux';
+import { loginSuccess } from '../store/userSlice';
 import styles from './Login.module.css';
 
 interface LoginProps {
@@ -18,7 +21,8 @@ const Login: React.FC<LoginProps> = ({ onLoginSuccess }) => {
     password: ''
   });
 
-  const navigate = useNavigate(); // используем навигацию
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
 
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -47,6 +51,8 @@ const Login: React.FC<LoginProps> = ({ onLoginSuccess }) => {
       const result = await response.json();
       console.log('Success:', result);
 
+      // Сохраняем email и userId в Redux-хранилище
+      dispatch(loginSuccess({ email: formData.email, userId: result.userId }));
       onLoginSuccess(); // Вызываем функцию после успешной авторизации
     } catch (error) {
       console.error('Error:', error);

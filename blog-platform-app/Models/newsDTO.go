@@ -4,6 +4,7 @@ import "time"
 
 type NewsDTO struct {
 	ID       uint      `json:"id" db:"id"`
+	UserId   uint      `json:"user_id" db:"user_id"`
 	UserName string    `json:"user_name" db:"user_name"`
 	Surname  string    `json:"surname" db:"surname"`
 	Title    string    `json:"title" db:"title"`

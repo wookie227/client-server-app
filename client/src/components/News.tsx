@@ -1,8 +1,11 @@
+// src/components/News.tsx
 import React, { useEffect, useState } from 'react';
 import Cookies from 'js-cookie';
-import { Fab } from '@mui/material';
+import { Fab, Button } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import CreateNewsDialog from './CreateNewsDialog';
+import { useSelector } from 'react-redux';
+import { RootState } from '../store/store'; // Импортируйте RootState
 import styles from './News.module.css';
 
 const News: React.FC = () => {
@@ -10,6 +13,9 @@ const News: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [openCreateDialog, setOpenCreateDialog] = useState(false);
+  const [editingNews, setEditingNews] = useState<any | null>(null);
+  
+  const user = useSelector((state: RootState) => state.user); // Получаем информацию о пользователе
 
   useEffect(() => {
     const fetchNews = async () => {
@@ -42,6 +48,35 @@ const News: React.FC = () => {
     fetchNews();
   }, []);
 
+  const handleEdit = (news: any) => {
+    setEditingNews(news);
+    setOpenCreateDialog(true);
+  };
+
+  const handleDelete = async (newsId: number) => {
+    const token = Cookies.get('authToken');
+    
+    try {
+      const response = await fetch(`http://localhost:8000/api/news/${newsId}`, {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
+        credentials: 'include',
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to delete news');
+      }
+
+      setNewsList(newsList.filter((news) => news.id !== newsId)); // Обновляем список новостей
+    } catch (error) {
+      console.error('Error deleting news:', error);
+      setError('Failed to delete news');
+    }
+  };
+
   if (loading) {
     return <p>Loading...</p>;
   }
@@ -71,6 +106,17 @@ const News: React.FC = () => {
                   className={styles.newsImage}
                 />
               )}
+              {/* Проверяем, принадлежит ли новость текущему пользователю */}
+              {user.isAuthenticated && user.userId === news.user_id && (
+                <div className={styles.buttonsContainer}>
+                  <Button variant="outlined" onClick={() => handleEdit(news)}>
+                    Edit
+                  </Button>
+                  <Button variant="outlined" color="error" onClick={() => handleDelete(news.id)}>
+                    Delete
+                  </Button>
+                </div>
+              )}
             </div>
           ))
         ) : (
@@ -82,7 +128,10 @@ const News: React.FC = () => {
         color="primary"
         className={styles.fab}
         style={{ position: 'fixed' }}
-        onClick={() => setOpenCreateDialog(true)}
+        onClick={() => {
+          setEditingNews(null); // Обнуляем состояние редактирования перед открытием диалога
+          setOpenCreateDialog(true);
+        }}
       >
         <AddIcon />
       </Fab>
@@ -90,6 +139,7 @@ const News: React.FC = () => {
       <CreateNewsDialog
         open={openCreateDialog}
         onClose={() => setOpenCreateDialog(false)}
+        // newsToEdit={editingNews} // Передаем новость для редактирования
       />
     </>
   );
