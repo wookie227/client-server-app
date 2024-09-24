@@ -1,11 +1,11 @@
 // src/components/News.tsx
 import React, { useEffect, useState } from 'react';
 import Cookies from 'js-cookie';
-import { Fab, Button } from '@mui/material';
+import { Fab, Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import CreateNewsDialog from './CreateNewsDialog';
 import { useSelector } from 'react-redux';
-import { RootState } from '../store/store'; // Импортируйте RootState
+import { RootState } from '../store/store';
 import styles from './News.module.css';
 
 const News: React.FC = () => {
@@ -14,8 +14,10 @@ const News: React.FC = () => {
   const [error, setError] = useState('');
   const [openCreateDialog, setOpenCreateDialog] = useState(false);
   const [editingNews, setEditingNews] = useState<any | null>(null);
-  
-  const user = useSelector((state: RootState) => state.user); // Получаем информацию о пользователе
+  const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
+  const [newsToDelete, setNewsToDelete] = useState<number | null>(null);
+
+  const user = useSelector((state: RootState) => state.user);
 
   useEffect(() => {
     const fetchNews = async () => {
@@ -53,11 +55,18 @@ const News: React.FC = () => {
     setOpenCreateDialog(true);
   };
 
-  const handleDelete = async (newsId: number) => {
+  const confirmDelete = (newsId: number) => {
+    setNewsToDelete(newsId);
+    setOpenDeleteDialog(true);
+  };
+
+  const handleDelete = async () => {
+    if (newsToDelete === null) return;
+
     const token = Cookies.get('authToken');
-    
+
     try {
-      const response = await fetch(`http://localhost:8000/api/news/${newsId}`, {
+      const response = await fetch(`http://localhost:8000/api/news/${newsToDelete}`, {
         method: 'DELETE',
         headers: {
           'Content-Type': 'application/json',
@@ -70,11 +79,19 @@ const News: React.FC = () => {
         throw new Error('Failed to delete news');
       }
 
-      setNewsList(newsList.filter((news) => news.id !== newsId)); // Обновляем список новостей
+      setNewsList(newsList.filter((news) => news.id !== newsToDelete));
+      setOpenDeleteDialog(false);
+      setNewsToDelete(null);
     } catch (error) {
       console.error('Error deleting news:', error);
       setError('Failed to delete news');
+      setOpenDeleteDialog(false);
     }
+  };
+
+  const handleCloseDeleteDialog = () => {
+    setOpenDeleteDialog(false);
+    setNewsToDelete(null);
   };
 
   if (loading) {
@@ -106,13 +123,12 @@ const News: React.FC = () => {
                   className={styles.newsImage}
                 />
               )}
-              {/* Проверяем, принадлежит ли новость текущему пользователю */}
               {user.isAuthenticated && user.userId === news.user_id && (
                 <div className={styles.buttonsContainer}>
                   <Button variant="outlined" onClick={() => handleEdit(news)}>
                     Edit
                   </Button>
-                  <Button variant="outlined" color="error" onClick={() => handleDelete(news.id)}>
+                  <Button variant="outlined" color="error" onClick={() => confirmDelete(news.id)}>
                     Delete
                   </Button>
                 </div>
@@ -129,7 +145,7 @@ const News: React.FC = () => {
         className={styles.fab}
         style={{ position: 'fixed' }}
         onClick={() => {
-          setEditingNews(null); // Обнуляем состояние редактирования перед открытием диалога
+          setEditingNews(null);
           setOpenCreateDialog(true);
         }}
       >
@@ -139,8 +155,30 @@ const News: React.FC = () => {
       <CreateNewsDialog
         open={openCreateDialog}
         onClose={() => setOpenCreateDialog(false)}
-        // newsToEdit={editingNews} // Передаем новость для редактирования
       />
+
+      {/* Confirmation dialog for delete */}
+      <Dialog
+        open={openDeleteDialog}
+        onClose={handleCloseDeleteDialog}
+        aria-labelledby="delete-dialog-title"
+        aria-describedby="delete-dialog-description"
+      >
+        <DialogTitle id="delete-dialog-title">Confirm Deletion</DialogTitle>
+        <DialogContent>
+          <DialogContentText id="delete-dialog-description">
+            Are you sure you want to delete this news item? This action cannot be undone.
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleCloseDeleteDialog} color="primary">
+            Cancel
+          </Button>
+          <Button onClick={handleDelete} color="error" autoFocus>
+            Delete
+          </Button>
+        </DialogActions>
+      </Dialog>
     </>
   );
 };

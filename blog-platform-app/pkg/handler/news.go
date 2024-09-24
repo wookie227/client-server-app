@@ -2,10 +2,13 @@ package handler
 
 import (
 	models "blog-platform-app/Models"
+	"database/sql"
+	"errors"
 	"fmt"
 	"io"
 	"net/http"
 	"os"
+	"strconv"
 	"strings"
 	"time"
 
@@ -110,5 +113,23 @@ func (h *Handler) updateNew(c *gin.Context) {
 }
 
 func (h *Handler) deleteNew(c *gin.Context) {
+	idParam := c.Param("id")
 
+	id, err := strconv.Atoi(idParam)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid ID parameter"})
+		return
+	}
+
+	err = h.services.News.Delete(id)
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) { // Если запись не найдена
+			c.JSON(http.StatusNotFound, gin.H{"error": "Record not found"})
+		} else {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to delete record"})
+		}
+		return
+	}
+
+	c.JSON(http.StatusNoContent, nil)
 }

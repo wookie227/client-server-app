@@ -20,3 +20,7 @@ func (s *NewsListService) GetAll() ([]models.NewsDTO, error) {
 func (s *NewsListService) Create(news models.News) (*models.News, error) {
 	return s.repo.Create(news)
 }
+
+func (s *NewsListService) Delete(id int) error {
+	return s.repo.Delete(id)
+}

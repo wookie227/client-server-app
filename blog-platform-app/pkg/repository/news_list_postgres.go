@@ -49,3 +49,23 @@ func (r *NewsListPostgres) GetAll() ([]models.NewsDTO, error) {
 
 	return news, nil
 }
+
+func (r *NewsListPostgres) Delete(id int) error {
+	query := "DELETE FROM news WHERE id = $1"
+
+	result, err := r.db.Exec(query, id)
+	if err != nil {
+		return err
+	}
+
+	rowsAffected, err := result.RowsAffected()
+	if err != nil {
+		return err
+	}
+
+	if rowsAffected == 0 {
+		return fmt.Errorf("record with id %d not found", id)
+	}
+
+	return nil
+}
