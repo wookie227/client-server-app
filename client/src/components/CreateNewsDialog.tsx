@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   Button,
   Dialog,
@@ -15,13 +15,27 @@ import Cookies from 'js-cookie';
 interface CreateNewsDialogProps {
   open: boolean;
   onClose: () => void;
+  editingNews?: any; // Новый пропс для передачи редактируемой новости
 }
 
-const CreateNewsDialog: React.FC<CreateNewsDialogProps> = ({ open, onClose }) => {
+const CreateNewsDialog: React.FC<CreateNewsDialogProps> = ({ open, onClose, editingNews }) => {
   const [title, setTitle] = useState('');
   const [text, setText] = useState('');
   const [image, setImage] = useState<File | null>(null);
   const [error, setError] = useState<string | null>(null);
+
+  // Если мы редактируем, заполняем поля
+  useEffect(() => {
+    if (editingNews) {
+      setTitle(editingNews.title);
+      setText(editingNews.text);
+    } else {
+      // Очистка полей при создании новой новости
+      setTitle('');
+      setText('');
+      setImage(null);
+    }
+  }, [editingNews]);
 
   // Обработка выбора файла
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -31,7 +45,7 @@ const CreateNewsDialog: React.FC<CreateNewsDialogProps> = ({ open, onClose }) =>
     }
   };
 
-  // Обработка формы отправки
+  // Обработка отправки формы
   const handleSubmit = async () => {
     const formData = new FormData();
     formData.append('title', title);
@@ -43,13 +57,19 @@ const CreateNewsDialog: React.FC<CreateNewsDialogProps> = ({ open, onClose }) =>
 
     const token = Cookies.get('authToken');
     if (!token) {
-      setError('Authentication token is missing');
+      setError('Токен аутентификации отсутствует');
       return;
     }
 
     try {
-      const response = await fetch('http://localhost:8000/api/news', {
-        method: 'POST',
+      const url = editingNews 
+        ? `http://localhost:8000/api/news/${editingNews.id}`
+        : 'http://localhost:8000/api/news';
+
+      const method = editingNews ? 'PUT' : 'POST';
+
+      const response = await fetch(url, {
+        method,
         headers: {
           'Authorization': `Bearer ${token}`,
         },
@@ -58,23 +78,23 @@ const CreateNewsDialog: React.FC<CreateNewsDialogProps> = ({ open, onClose }) =>
       });
 
       if (!response.ok) {
-        throw new Error('Failed to create news');
+        throw new Error(editingNews ? 'Не удалось обновить новость' : 'Не удалось создать новость');
       }
 
       const result = await response.json();
-      console.log('News created:', result);
+      console.log('Новость успешно обработана:', result);
 
       onClose();
       window.location.reload();
     } catch (error) {
-      setError('Error creating news');
-      console.error('Error:', error);
+      setError(editingNews ? 'Ошибка при обновлении новости' : 'Ошибка при создании новости');
+      console.error('Ошибка:', error);
     }
   };
 
   return (
     <Dialog open={open} onClose={onClose} fullWidth maxWidth="md">
-      <DialogTitle>Create a New Post</DialogTitle>
+      <DialogTitle>{editingNews ? 'Редактировать новость' : 'Создать новую новость'}</DialogTitle>
 
       <DialogContent>
         <Grid container spacing={2}>
@@ -83,7 +103,7 @@ const CreateNewsDialog: React.FC<CreateNewsDialogProps> = ({ open, onClose }) =>
               autoFocus
               fullWidth
               variant="outlined"
-              label="Title"
+              label="Заголовок"
               value={title}
               onChange={(e) => setTitle(e.target.value)}
             />
@@ -93,7 +113,7 @@ const CreateNewsDialog: React.FC<CreateNewsDialogProps> = ({ open, onClose }) =>
             <TextField
               fullWidth
               variant="outlined"
-              label="Text"
+              label="Текст"
               multiline
               rows={4}
               value={text}
@@ -111,7 +131,7 @@ const CreateNewsDialog: React.FC<CreateNewsDialogProps> = ({ open, onClose }) =>
             />
             <label htmlFor="file-upload">
               <Button variant="outlined" component="span" startIcon={<PhotoCamera />}>
-                Upload Image
+                Загрузить изображение
               </Button>
             </label>
             {image && (
@@ -133,10 +153,10 @@ const CreateNewsDialog: React.FC<CreateNewsDialogProps> = ({ open, onClose }) =>
 
       <DialogActions>
         <Button onClick={onClose} color="secondary">
-          Cancel
+          Отмена
         </Button>
         <Button onClick={handleSubmit} color="primary" variant="contained">
-          Submit
+          {editingNews ? 'Сохранить' : 'Создать'}
         </Button>
       </DialogActions>
     </Dialog>

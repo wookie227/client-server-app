@@ -51,8 +51,8 @@ const News: React.FC = () => {
   }, []);
 
   const handleEdit = (news: any) => {
-    setEditingNews(news);
-    setOpenCreateDialog(true);
+    setEditingNews(news); // Устанавливаем новость для редактирования
+    setOpenCreateDialog(true); // Открываем диалог
   };
 
   const confirmDelete = (newsId: number) => {
@@ -145,7 +145,7 @@ const News: React.FC = () => {
         className={styles.fab}
         style={{ position: 'fixed' }}
         onClick={() => {
-          setEditingNews(null);
+          setEditingNews(null); // Сбрасываем editingNews при создании новой новости
           setOpenCreateDialog(true);
         }}
       >
@@ -155,6 +155,7 @@ const News: React.FC = () => {
       <CreateNewsDialog
         open={openCreateDialog}
         onClose={() => setOpenCreateDialog(false)}
+        editingNews={editingNews} // Передаем editingNews
       />
 
       {/* Confirmation dialog for delete */}

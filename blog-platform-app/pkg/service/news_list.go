@@ -24,3 +24,7 @@ func (s *NewsListService) Create(news models.News) (*models.News, error) {
 func (s *NewsListService) Delete(id int) error {
 	return s.repo.Delete(id)
 }
+
+func (s *NewsListService) Update(news models.News) (*models.News, error) {
+	return s.repo.Update(news)
+}

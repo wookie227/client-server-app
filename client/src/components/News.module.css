@@ -9,7 +9,6 @@
   box-sizing: border-box; /* Для корректного подсчета ширины и отступов */
 }
 
-
 /* Заголовок страницы */
 .title {
   text-align: center;

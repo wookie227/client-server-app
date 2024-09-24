@@ -19,6 +19,7 @@ type News interface {
 	GetAll() ([]models.NewsDTO, error)
 	Create(news models.News) (*models.News, error)
 	Delete(id int) error
+	Update(news models.News) (*models.News, error)
 }
 
 type Chats interface {
