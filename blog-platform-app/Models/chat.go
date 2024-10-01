@@ -1,7 +1,7 @@
 package models
 
 type Chat struct {
-	ID       uint `gorm:"primaryKey"`
+	ID       uint
 	Title    string
 	ImageURL string
 }

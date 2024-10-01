@@ -3,11 +3,9 @@ package models
 import "time"
 
 type Message struct {
-	ID     uint `gorm:"primaryKey"`
-	ChatID uint `gorm:"not null"`
-	Chat   Chat `gorm:"foreignKey:ChatID"`
-	UserID uint `gorm:"not null"`
-	User   User `gorm:"foreignKey:UserID"`
+	ID     uint
+	ChatID uint
+	UserID uint
 	Text   string
 	Time   time.Time
 }
