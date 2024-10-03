@@ -1,7 +1,7 @@
 package repository
 
 import (
-	models "blog-platform-app/Models"
+	models "blog-platform-app/models"
 	"fmt"
 
 	"github.com/jmoiron/sqlx"

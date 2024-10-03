@@ -1,7 +1,7 @@
 package main
 
 import (
-	models "blog-platform-app/Models"
+	models "blog-platform-app/models"
 	"blog-platform-app/pkg/handler"
 	"blog-platform-app/pkg/repository"
 	"blog-platform-app/pkg/service"

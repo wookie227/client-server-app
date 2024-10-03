@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"fmt"
 	"log"
 	"net/http"
 	"sync"
@@ -9,57 +10,49 @@ import (
 	"github.com/gorilla/websocket"
 )
 
-// Используем для апгрейда соединения HTTP до WebSocket
 var upgrader = websocket.Upgrader{
 	ReadBufferSize:  1024,
 	WriteBufferSize: 1024,
 	CheckOrigin: func(r *http.Request) bool {
-		// Здесь можно добавить проверку разрешенных источников
 		return true
 	},
 }
 
-// Hub — центральный узел для управления подключениями WebSocket
-type Hub struct {
-	clients    map[*websocket.Conn]bool // Подключенные клиенты
-	broadcast  chan []byte              // Канал для отправки сообщений всем клиентам
-	register   chan *websocket.Conn     // Регистрация новых клиентов
-	unregister chan *websocket.Conn     // Отключение клиентов
-	mu         sync.Mutex               // Мьютекс для безопасного доступа к данным
+type Message struct {
+	UserId   int    `json:"userId"`   // ID получателя
+	SenderId int    `json:"senderId"` // ID отправителя
+	Text     string `json:"text"`     // Текст сообщения
 }
 
-// Создаем новый хаб
+type Hub struct {
+	clients    map[int]*websocket.Conn // Подключенные клиенты, теперь по userID
+	broadcast  chan Message            // Канал для отправки сообщений всем клиентам
+	register   chan *websocket.Conn    // Регистрация новых клиентов
+	unregister chan *websocket.Conn    // Отключение клиентов
+	mu         sync.Mutex              // Мьютекс для безопасного доступа к данным
+}
+
 func newHub() *Hub {
 	return &Hub{
-		clients:    make(map[*websocket.Conn]bool),
-		broadcast:  make(chan []byte),
+		clients:    make(map[int]*websocket.Conn),
+		broadcast:  make(chan Message),
 		register:   make(chan *websocket.Conn),
 		unregister: make(chan *websocket.Conn),
 	}
 }
 
-// Запуск хаба
 func (h *Hub) run() {
 	for {
 		select {
-		case conn := <-h.register:
-			h.mu.Lock()
-			h.clients[conn] = true
-			h.mu.Unlock()
-		case conn := <-h.unregister:
-			h.mu.Lock()
-			if _, ok := h.clients[conn]; ok {
-				delete(h.clients, conn)
-				conn.Close()
-			}
-			h.mu.Unlock()
 		case message := <-h.broadcast:
 			h.mu.Lock()
-			for conn := range h.clients {
-				err := conn.WriteMessage(websocket.TextMessage, message)
+			if conn, ok := h.clients[message.UserId]; ok {
+				// Отправляем сообщение конкретному пользователю
+				err := conn.WriteJSON(message)
 				if err != nil {
+					log.Println("Error sending message:", err)
 					conn.Close()
-					delete(h.clients, conn)
+					delete(h.clients, message.UserId)
 				}
 			}
 			h.mu.Unlock()
@@ -67,27 +60,44 @@ func (h *Hub) run() {
 	}
 }
 
-// Обработчик подключения WebSocket
 func (h *Hub) handleConnections(c *gin.Context) {
 	conn, err := upgrader.Upgrade(c.Writer, c.Request, nil)
 	if err != nil {
-		log.Println(err)
+		log.Println("Error upgrading to WebSocket:", err)
 		return
 	}
 	defer func() {
 		h.unregister <- conn
 	}()
 
-	h.register <- conn
+	// Важно: предполагается, что userID будет передаваться в качестве параметра URL, например, /ws?userId=1
+	userIdStr := c.Query("userId")
+	if userIdStr == "" {
+		log.Println("User ID is missing")
+		return
+	}
 
-	// Чтение сообщений от клиентов
+	// Преобразуйте userID из строки в int
+	var userId int
+	if _, err := fmt.Sscanf(userIdStr, "%d", &userId); err != nil {
+		log.Println("Invalid User ID")
+		return
+	}
+
+	// Регистрируем подключение
+	h.mu.Lock()
+	h.clients[userId] = conn
+	h.mu.Unlock()
+
 	for {
-		_, message, err := conn.ReadMessage()
+		var message Message
+		err := conn.ReadJSON(&message)
 		if err != nil {
-			log.Println("Error reading message:", err)
+			log.Println("Error reading JSON message:", err)
 			break
 		}
-		// Отправляем сообщение всем подключенным клиентам
+
+		// Отправляем сообщение в канал broadcast
 		h.broadcast <- message
 	}
 }

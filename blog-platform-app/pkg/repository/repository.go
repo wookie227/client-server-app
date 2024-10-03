@@ -1,7 +1,7 @@
 package repository
 
 import (
-	models "blog-platform-app/Models"
+	models "blog-platform-app/models"
 
 	"github.com/jmoiron/sqlx"
 )
@@ -23,7 +23,16 @@ type News interface {
 }
 
 type Chats interface {
-	GetAll() ([]models.Chat, error)
+	CreateChat(chat models.Chat) (uint, error)
+	GetAllChats() ([]models.Chat, error)
+	GetChatByID(chatID uint) (models.Chat, error)
+	UpdateChat(chatID uint, input models.Chat) error
+	DeleteChat(chatID uint) error
+	GetMessagesByChatID(chatID uint) ([]models.Message, error)
+	CreateMessage(message models.Message) (uint, error)
+	GetMessageByID(messageID uint) (models.Message, error)
+	UpdateMessage(messageID uint, input models.Message) error
+	DeleteMessage(messageID uint) error
 }
 
 type ChatMembers interface {
@@ -48,5 +57,6 @@ func NewRepository(db *sqlx.DB) *Repository {
 		Authorization: NewAuthPostgres(db),
 		Users:         NewUsersListPostgres(db),
 		News:          NewNewsListPostgres(db),
+		Chats:         NewChatRepository(db),
 	}
 }

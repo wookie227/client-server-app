@@ -1,7 +1,7 @@
 package handler
 
 import (
-	models "blog-platform-app/Models"
+	models "blog-platform-app/models"
 	"net/http"
 
 	"github.com/gin-gonic/gin"

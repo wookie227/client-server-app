@@ -1,7 +1,7 @@
 package service
 
 import (
-	models "blog-platform-app/Models"
+	models "blog-platform-app/models"
 	"blog-platform-app/pkg/repository"
 )
 

@@ -57,7 +57,7 @@ func (h *Handler) InitRoutes() *gin.Engine {
 			chats.DELETE("/:chat_id", h.deleteChat)
 		}
 
-		chatMembers := chats.Group("/chat-members", h.userIdentity)
+		chatMembers := chats.Group("/:chat_id/members", h.userIdentity)
 		{
 			chatMembers.POST("/", h.createChatMember)
 			chatMembers.GET("/", h.getAllChatMembers)
@@ -66,13 +66,13 @@ func (h *Handler) InitRoutes() *gin.Engine {
 			chatMembers.DELETE("/:chat_member_id", h.deleteChatMember)
 		}
 
-		messages := chats.Group("/messages", h.userIdentity)
+		messages := chats.Group("/:chat_id/messages", h.userIdentity)
 		{
-			messages.POST("/", h.createMessage)
-			messages.GET("/", h.getAllMessages)
-			messages.GET("/:message_id", h.getMessageById)
-			messages.PUT("/:message_id", h.updateMessage)
-			messages.DELETE("/:message_id", h.deleteMessage)
+			messages.POST("/", h.createMessage)              // Создать новое сообщение
+			messages.GET("/", h.getMessagesByChatID)         // Получить все сообщения для конкретного чата
+			messages.GET("/:message_id", h.getMessageById)   // Получить конкретное сообщение по ID
+			messages.PUT("/:message_id", h.updateMessage)    // Обновить конкретное сообщение
+			messages.DELETE("/:message_id", h.deleteMessage) // Удалить конкретное сообщение
 		}
 	}
 
